@@ -3,7 +3,8 @@
 
 A tiny newspaper front page drawn entirely with the Python standard
 library. No network, no randomness, no wall-clock time: running this
-script twice produces a byte-identical image.png next to itself.
+script twice produces a byte-identical image.png, written to
+MAKEFUN_OUTPUT_DIR when that variable is set, otherwise next to itself.
 
 Layout: a masthead dated 20 November 2026, then a 3 x 2 grid of story
 panels. Each panel carries a kicker, a headline, a short body, one stat
@@ -306,6 +307,19 @@ def write_png(path, canvas):
         fh.write(data)
 
 
+def output_dir():
+    """Directory for image.png.
+
+    The grader mounts the repo read-only and provides a writable
+    directory via MAKEFUN_OUTPUT_DIR; honour it when set, otherwise
+    fall back to the directory holding this script.
+    """
+    env_dir = os.environ.get('MAKEFUN_OUTPUT_DIR')
+    if env_dir:
+        return env_dir
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 # --------------------------------------------------------------------------
 # The news of 20 November 2026 (researched on the morning of the day)
 # --------------------------------------------------------------------------
@@ -543,8 +557,7 @@ def build():
 
     draw_briefs(canvas)
     draw_footer(canvas)
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                       'image.png')
+    out = os.path.join(output_dir(), 'image.png')
     write_png(out, canvas)
     print('wrote', out, WIDTH, 'x', HEIGHT)
 
